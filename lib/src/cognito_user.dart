@@ -360,7 +360,8 @@ class CognitoUser {
     final data = await client.request('RespondToAuthChallenge', params);
     final challengeParameters = data['ChallengeParameters'];
     final serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
-    final salt = BigInt.parse(challengeParameters['SALT'], radix: 16);
+    final saltString = authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
+    final salt = BigInt.parse(saltString, radix: 16);
 
     final hkdf = authenticationHelper.getPasswordAuthenticationKey(
         _deviceKey, _randomPassword, serverBValue, salt);
@@ -517,6 +518,7 @@ class CognitoUser {
     );
     final dateHelper = new DateHelper();
     BigInt serverBValue;
+    String saltString;
     BigInt salt;
 
     Map<String, String> authParameters = {};
@@ -553,7 +555,8 @@ class CognitoUser {
 
     this.username = challengeParameters['USER_ID_FOR_SRP'];
     serverBValue = BigInt.parse(challengeParameters['SRP_B'], radix: 16);
-    salt = BigInt.parse(challengeParameters['SALT'], radix: 16);
+    saltString = authenticationHelper.toUnsignedHex(challengeParameters['SALT']);
+    salt = BigInt.parse(saltString, radix: 16);
 
     var hkdf = authenticationHelper.getPasswordAuthenticationKey(
       this.username,
