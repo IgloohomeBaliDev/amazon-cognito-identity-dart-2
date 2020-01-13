@@ -303,8 +303,9 @@ class CognitoUser {
   }
 
   getCachedDeviceKeyAndPassword() async {
+    String usernameWithOutDomain = this.username.substring(0,this.username.indexOf("@"));
     final String keyPrefix =
-        'CognitoIdentityServiceProvider.${pool.getClientId()}.$username';
+        'CognitoIdentityServiceProvider.${pool.getClientId()}.$usernameWithOutDomain';
     final String deviceKeyKey = '$keyPrefix.deviceKey';
     final String randomPasswordKey = '$keyPrefix.randomPasswordKey';
     final String deviceGroupKeyKey = '$keyPrefix.deviceGroupKey';
