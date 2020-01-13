@@ -17,6 +17,7 @@ import 'cognito_user_exceptions.dart';
 import 'cognito_user_pool.dart';
 import 'cognito_user_session.dart';
 import 'date_helper.dart';
+import 'package:flutter/foundation.dart';
 
 class CognitoUserAuthResult {
   String challengeName;
@@ -27,6 +28,11 @@ class CognitoUserAuthResult {
     this.session,
     this.authenticationResult,
   });
+}
+
+enum UpdateDeviceStatus {
+  remembered,
+  not_remembered
 }
 
 class CognitoUser {
@@ -154,6 +160,22 @@ class CognitoUser {
           signInUserSession: _signInUserSession);
     }
     return _signInUserSession;
+  }
+
+  /// This is used to update Device status either remembered or not_remembered
+  /// Set rememberStatus value to remembered or not_remembered
+  Future<void> updateDeviceStatus(UpdateDeviceStatus updateDeviceStatus) async {
+    await getCachedDeviceKeyAndPassword();
+    if (_deviceKey != null) {
+      final Map<String, dynamic> paramsUpdateDeviceStatus = {
+        'DeviceKey': _deviceKey,
+        'AccessToken': _signInUserSession.getAccessToken().getJwtToken(),
+        'DeviceRememberedStatus': describeEnum(updateDeviceStatus),
+      };
+      await client.request("UpdateDeviceStatus", paramsUpdateDeviceStatus);
+    }else{
+      throw Exception("Device key is nulll, Cannnot update device status");
+    }
   }
 
   /// This is used to get a session, either from the session object
